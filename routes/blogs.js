@@ -28,7 +28,7 @@ try {
 }
 
 
-// GET ONE ID
+// GET ONE
 
 router.get('/get-one/:id', async function(req, res, next) {
 try {
@@ -65,18 +65,18 @@ try {
         const categories = req.body.categories
         const starRating = req.body.starRating
         const id = uuid()
-         
- // This is the object thats being created
+
+ // This is the object thats being created from the stuff above
         const blogData = {
-         title,
-         text,
-         author,
-         email,
-         categories,
-         starRating,
-         id: id,
-         createdAt: new Date(),
-         lastModified: new Date()
+        title,
+        text,
+        author,
+        email,
+        categories,
+        starRating,
+        id: id,
+        createdAt: new Date(),
+        lastModified: new Date()
         }
         } 
         catch (err) {
@@ -87,10 +87,9 @@ try {
                         })
         }
 
-
     //    Blog post is inserting 'blogData' that has to be found from on top into the data base collection
-       const blogPost = await db().collection("BlogsDB").insert(blogData)
-       res.json({
+    const blogPost = await db().collection("BlogsDB").insert(blogData)
+    res.json({
         success: true,
         post: blogPost
     })
@@ -102,16 +101,29 @@ try {
 
     // PUT one 
     router.put('/update-one/:id', async function(req, res, next){
-        const starRating = req.body.starRating
-        const lastModified: new Date()
-    
-        const originalBlogIndex = 
+        try{
+            const id = req.params.id
+            const title = req.body.title
+            const text = req.body.text
+            const author = req.body.author
+            const email = req.body.email
+            const categories = req.body.categories
+            const starRating = req.body.starRating
+            const lastModified = new Date()
 
+            const blogPost = await db().collection("BlogsDB").update({id:id},{$set: {"starRating": starRating, "lastModified": lastModified}})
 
-
-
-
-
-
-
+            res.json({
+                success: true,
+                post: blogPost
+            })
+        }
+        catch (err) {
+            console.log(err.name)
+                        res.json({
+                            success: false,
+                            error: err.toString()
+                        })
+        }
+   
     })
