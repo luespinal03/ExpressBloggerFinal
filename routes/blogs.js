@@ -1,6 +1,9 @@
 const { uuid } = require('uuidv4');
 var express = require('express');
 var router = express.Router();
+var {
+    validateBlogData
+} = require('../validations/blogs')
 
 const {db} = require("../mongo")
 
@@ -10,6 +13,7 @@ const {db} = require("../mongo")
 
     router.get('/get-one-example', async function(req, res, next) {
         try {
+
         const blogPost = await db().collection("BlogsDB").findOne({
             id: {
                 $exists: true
@@ -21,7 +25,7 @@ const {db} = require("../mongo")
             })
         } 
         catch (err) {
-            console.log(err.name)
+            console.log(err)
 				res.json({
 					success: false,
 					error: err.toString()
@@ -36,6 +40,7 @@ const {db} = require("../mongo")
 router.get('/get-one/:id', async function(req, res, next) {
 try {
         const blogId = req.params.id
+    
         const blogPost = await db().collection("BlogsDB").findOne({
             id: blogId
         })
@@ -45,7 +50,7 @@ try {
         })
             
 } catch (err) {
-    console.log(err.name)
+    console.log(err)
 				res.json({
 					success: false,
 					error: err.toString()
@@ -80,9 +85,24 @@ try {
         createdAt: new Date(),
         lastModified: new Date()
         }
+
+        const blogCheck = validateBlogData(blogData)
+        if(blogCheck.isValid === false){
+            res.json({
+                success: false,
+                message: blogCheck.message
+            })
+            return;
+        }
+
+        const blogPost = await db().collection("BlogsDB").insertOne(blogData)
+        res.json({
+            success: true,
+            post: blogPost
+        })
         } 
         catch (err) {
-            console.log(err.name)
+            console.log(err)
                         res.json({
                             success: false,
                             error: err.toString()
@@ -90,11 +110,7 @@ try {
         }
 
     //    Blog post is inserting 'blogData' that has to be found from on top into the data base collection
-    const blogPost = await db().collection("BlogsDB").insert(blogData)
-    res.json({
-        success: true,
-        post: blogPost
-    })
+   
     })
 
 
@@ -105,6 +121,16 @@ try {
             const starRating = req.body.starRating
             const lastModified = new Date()
 
+
+            const blogCheck = validateBlogData(blogData)
+            if(blogCheck.isValid === false){
+                res.json({
+                    success: false,
+                    message: blogCheck.message
+                })
+                return;
+            }
+
             const blogPost = await db().collection("BlogsDB").update({id:id},{$set: {"starRating": starRating, "lastModified": lastModified}})
 
             res.json({
@@ -113,7 +139,7 @@ try {
             })
         }
         catch (err) {
-            console.log(err.name)
+            console.log(err)
                         res.json({
                             success: false,
                             error: err.toString()
@@ -135,7 +161,7 @@ try {
                 success: true
             })
         } catch (err) {
-            console.log(err.name)
+            console.log(err)
             res.json({
                 success: false,
                 error: err.toString()
