@@ -7,8 +7,9 @@ const {db} = require("../mongo")
 
 
 // GET ONE EXAMPLE
-try {
+
     router.get('/get-one-example', async function(req, res, next) {
+        try {
         const blogPost = await db().collection("BlogsDB").findOne({
             id: {
                 $exists: true
@@ -18,14 +19,16 @@ try {
                 success: true,
                 post: blogPost
             })
-        });
-} catch (err) {
-    console.log(err.name)
+        } 
+        catch (err) {
+            console.log(err.name)
 				res.json({
 					success: false,
 					error: err.toString()
 				})
-}
+        }
+    });
+
 
 
 // GET ONE
@@ -49,7 +52,6 @@ try {
 				})
 }
 });
-	module.exports = router;
 
 
 
@@ -96,18 +98,10 @@ try {
     })
 
 
-
-
-
     // PUT one 
     router.put('/update-one/:id', async function(req, res, next){
         try{
             const id = req.params.id
-            const title = req.body.title
-            const text = req.body.text
-            const author = req.body.author
-            const email = req.body.email
-            const categories = req.body.categories
             const starRating = req.body.starRating
             const lastModified = new Date()
 
@@ -125,5 +119,29 @@ try {
                             error: err.toString()
                         })
         }
-   
     })
+
+
+
+    // DELETE one
+    router.delete("/delete-one/:id", async function(req, res, next){
+        try {
+            const id = req.params.id
+
+            const blogPost = await db().collection("BlogsDB").deleteOne({
+                id:id
+            })
+            res.json({
+                success: true
+            })
+        } catch (err) {
+            console.log(err.name)
+            res.json({
+                success: false,
+                error: err.toString()
+            })
+        }
+    });
+
+
+    module.exports = router;
