@@ -114,7 +114,7 @@ try {
     })
 
 
-    // PUT one 
+    // PUT (Update) one 
     router.put('/update-one/:id', async function(req, res, next){
         try{
             const id = req.params.id
